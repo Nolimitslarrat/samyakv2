@@ -1,16 +1,21 @@
 import Link from 'next/link'
 import styles from './page.module.css'
 import { Plus, MapPin, Calendar, Edit, Trash2 } from 'lucide-react'
-import { PrismaClient } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
-const prisma = new PrismaClient()
 
 async function getProjects() {
-    const projects = await prisma.project.findMany({
-        orderBy: { createdAt: 'desc' }
-    })
-    return projects
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/projects`, {
+            cache: 'no-store',
+        })
+        if (!res.ok) return []
+        const data = await res.json()
+        return Array.isArray(data) ? data : []
+    } catch (err) {
+        console.error('Failed to fetch projects:', err)
+        return []
+    }
 }
 
 export default async function AdminProjectsPage() {

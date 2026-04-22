@@ -1,38 +1,24 @@
 import Link from 'next/link'
 import styles from './page.module.css'
 import { Building2, IndianRupee, Users, TrendingUp, Plus, ExternalLink, MessageSquare } from 'lucide-react'
-import { PrismaClient } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
-const prisma = new PrismaClient()
 
 async function getStats() {
     try {
-        const propertyCount = await prisma.property.count()
-        const enquiryCount = await prisma.enquiry.count()
-        // Improve this: Sum price of properties with status 'Sold' if price was consistent number
-        const revenue = '₹0'
-
-        const recentProperties = await prisma.property.findMany({
-            take: 5,
-            orderBy: { createdAt: 'desc' }
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/dashboard`, {
+            cache: 'no-store',
         })
-
-        const recentEnquiries = await prisma.enquiry.findMany({
-            take: 5,
-            orderBy: { createdAt: 'desc' }
-        })
-
-        return { propertyCount, enquiryCount, revenue, recentProperties, recentEnquiries }
+        if (!res.ok) throw new Error('Failed to fetch')
+        return res.json()
     } catch (error) {
         console.error("Dashboard Error:", error)
-        // Return safe defaults to prevent crash
         return {
             propertyCount: 0,
             enquiryCount: 0,
             revenue: 'Error',
             recentProperties: [],
-            recentEnquiries: []
+            recentEnquiries: [],
         }
     }
 }
@@ -44,7 +30,7 @@ export default async function AdminDashboard() {
         <div className={styles.dashboard}>
             <div className={styles.welcomeSection}>
                 <h1>Dashboard Overview</h1>
-                <p>Welcome back, Admin. Here's what's happening today.</p>
+                <p>Welcome back, Admin. Here&apos;s what&apos;s happening today.</p>
             </div>
 
             {/* Quick Stats Grid */}
@@ -141,4 +127,3 @@ export default async function AdminDashboard() {
         </div>
     )
 }
-

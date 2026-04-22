@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { queueNotifications } from '@/lib/notificationQueue';
-
-const prisma = new PrismaClient();
 
 /**
  * GET /api/notifications - Get notification history

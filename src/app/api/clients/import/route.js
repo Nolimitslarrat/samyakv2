@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import Papa from 'papaparse';
-
-const prisma = new PrismaClient();
 
 /**
  * POST /api/clients/import - Bulk import clients from CSV

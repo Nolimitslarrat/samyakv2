@@ -1,17 +1,20 @@
-import { MessageSquare, Calendar, Phone, Mail, Reply, Trash2, Share2 } from 'lucide-react'
-import { PrismaClient } from '@prisma/client'
+import { MessageSquare, Calendar, Phone, Reply, Trash2 } from 'lucide-react'
 import styles from './page.module.css'
 
-// Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
-const prisma = new PrismaClient()
-
 async function getEnquiries() {
-    const enquiries = await prisma.enquiry.findMany({
-        orderBy: { createdAt: 'desc' }
-    })
-    return enquiries
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/enquiries`, {
+            cache: 'no-store',
+        })
+        if (!res.ok) return []
+        const data = await res.json()
+        return Array.isArray(data) ? data : []
+    } catch (err) {
+        console.error('Failed to fetch enquiries:', err)
+        return []
+    }
 }
 
 export default async function AdminEnquiries() {

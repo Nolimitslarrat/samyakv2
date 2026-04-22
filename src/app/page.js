@@ -1,24 +1,26 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { ArrowRight, Search, MapPin, CheckCircle2 } from 'lucide-react'
-import { PrismaClient } from '@prisma/client'
 import styles from './page.module.css'
 import PropertyCard from '@/components/property/PropertyCard'
 import UpcomingProjects from '@/components/home/UpcomingProjects'
 import MapSection from '@/components/home/MapSection'
 
-// Force dynamic rendering
+// Force dynamic rendering to prevent build-time DB access
 export const dynamic = 'force-dynamic'
 
-const prisma = new PrismaClient()
-
 async function getFeaturedProperties() {
-  const properties = await prisma.property.findMany({
-    take: 3,
-    orderBy: { createdAt: 'desc' },
-    // In real app, filter by featured: true
-  })
-  return properties
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/properties`, {
+      cache: 'no-store',
+    })
+    if (!res.ok) return []
+    const data = await res.json()
+    // Return only the first 3 as featured
+    return Array.isArray(data) ? data.slice(0, 3) : []
+  } catch (err) {
+    console.error('Failed to fetch featured properties:', err)
+    return []
+  }
 }
 
 export default async function Home() {
@@ -32,7 +34,7 @@ export default async function Home() {
         <div className={`container ${styles.heroContent}`}>
           <h1 className={styles.heroTitle}>
             Find Your Dream Property in <br />
-            <span className={styles.highlight}>Pilkhuwa & Hapur</span>
+            <span className={styles.highlight}>Pilkhuwa &amp; Hapur</span>
           </h1>
           <p className={styles.heroSubtitle}>
             Trusted by thousands of families. We not only find you a plot, we find you a future.

@@ -2,20 +2,27 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { MapPin, Phone, Share2, ArrowLeft, Check, Calendar, Scaling, Home, FileText, Map } from 'lucide-react'
-import { PrismaClient } from '@prisma/client'
 import styles from './page.module.css'
-
 import ImageGallery from '@/components/property/ImageGallery'
 
 export const dynamic = 'force-dynamic'
-const prisma = new PrismaClient()
 
-// 1. Generate Dynamic Metadata for SEO
+async function getProperty(id) {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/properties/${id}`, {
+            cache: 'no-store',
+        })
+        if (!res.ok) return null
+        return res.json()
+    } catch {
+        return null
+    }
+}
+
+// Generate Dynamic Metadata for SEO
 export async function generateMetadata({ params }) {
     const { id } = await params
-    const property = await prisma.property.findUnique({
-        where: { id: parseInt(id) }
-    })
+    const property = await getProperty(id)
 
     if (!property) return { title: 'Property Not Found' }
 
@@ -23,20 +30,12 @@ export async function generateMetadata({ params }) {
         title: `${property.title} | Samyak Properties`,
         description: `Check out this ${property.type} for sale in ${property.location}. Price: ₹${property.price}. Contact us for a visit!`,
         openGraph: {
-            images: ['/images/hero-bg.jpg'], // Ideally, first image of property
+            images: ['/images/hero-bg.jpg'],
         },
     }
 }
 
-// 2. Fetch Data
-async function getProperty(id) {
-    const property = await prisma.property.findUnique({
-        where: { id: parseInt(id) }
-    })
-    return property
-}
-
-// 3. Helper for Images
+// Helper for Images
 const getImages = (prop) => {
     try {
         const parsed = typeof prop.images === 'string' ? JSON.parse(prop.images) : []

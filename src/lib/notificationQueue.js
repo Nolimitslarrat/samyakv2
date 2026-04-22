@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from './prisma';
 import { sendEmail } from './email';
 import { sendWhatsApp, formatWhatsAppNumber } from './whatsapp';
-
-const prisma = new PrismaClient();
 
 /**
  * Queue and send notifications to clients

@@ -1,16 +1,20 @@
 import styles from './page.module.css'
-import { MessagesSquare, ExternalLink } from 'lucide-react'
-import { PrismaClient } from '@prisma/client'
+import { MessagesSquare } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
-const prisma = new PrismaClient()
 
 async function getUpcomingEnquiries() {
-    const enquiries = await prisma.enquiry.findMany({
-        where: { type: 'UPCOMING' },
-        orderBy: { createdAt: 'desc' }
-    })
-    return enquiries
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/enquiries?type=UPCOMING`, {
+            cache: 'no-store',
+        })
+        if (!res.ok) return []
+        const data = await res.json()
+        return Array.isArray(data) ? data : []
+    } catch (err) {
+        console.error('Failed to fetch upcoming enquiries:', err)
+        return []
+    }
 }
 
 export default async function UpcomingInterestsPage() {
@@ -20,7 +24,7 @@ export default async function UpcomingInterestsPage() {
         <div>
             <div className={styles.header}>
                 <h1 className={styles.title}>Upcoming Project Interests</h1>
-                <p>Leads generated from the "Coming Soon" section.</p>
+                <p>Leads generated from the &quot;Coming Soon&quot; section.</p>
             </div>
 
             <div className={styles.tableCard}>
@@ -51,7 +55,7 @@ export default async function UpcomingInterestsPage() {
                                     <td>
                                         <div className={styles.contact}>
                                             <span>{enq.phone}</span>
-                                            {enq.message && <span className={styles.email}>{enq.message}</span>} {/* Using message field for email temporarily or expecting email field db schema update? User asked for email but schema update only added type/project. I will use message for email storage in frontend for now or check if I missed adding email to schema. User request: "take whatsapp number and emil id". My previous schema update step did NOT add email. I should fix that. For now I will assume message stores email or fix schema. Wait, schema has NO email field in Enquiry model! I missed adding 'email' string to schema in previous step? Checking schema... Enquiry model has name, phone, message. No email. USER REQUESTED EMAIL. I must add email to schema. */}
+                                            {enq.emailCaptured && <span className={styles.email}>{enq.emailCaptured}</span>}
                                         </div>
                                     </td>
                                     <td>{new Date(enq.createdAt).toLocaleDateString()}</td>

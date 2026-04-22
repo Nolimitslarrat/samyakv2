@@ -1,18 +1,21 @@
 import Link from 'next/link'
-import Image from 'next/image' // Added missing import
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { MapPin, Calendar, FileText, CheckCircle, ArrowLeft, Phone } from 'lucide-react'
-import { PrismaClient } from '@prisma/client'
 import styles from './page.module.css'
 
 export const dynamic = 'force-dynamic'
-const prisma = new PrismaClient()
 
 async function getProject(id) {
-    const project = await prisma.project.findUnique({
-        where: { id: parseInt(id) }
-    })
-    return project
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/projects/${id}`, {
+            cache: 'no-store',
+        })
+        if (!res.ok) return null
+        return res.json()
+    } catch {
+        return null
+    }
 }
 
 export async function generateMetadata({ params }) {
@@ -87,7 +90,7 @@ export default async function ProjectDetailsPage({ params }) {
 
                         {amenitiesList.length > 0 && (
                             <div className={styles.section}>
-                                <h2>Amenities & Features</h2>
+                                <h2>Amenities &amp; Features</h2>
                                 <div className={styles.amenitiesGrid}>
                                     {amenitiesList.map((item, idx) => (
                                         <div key={idx} className={styles.amenityItem}>
