@@ -1,7 +1,7 @@
 FROM node:20-bookworm-slim AS base
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 FROM base AS deps
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
@@ -28,9 +28,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Install openssl for Prisma
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-
+# openssl is already installed in base stage
 COPY --from=builder /app/public ./public
 
 RUN mkdir .next
