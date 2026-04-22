@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # Note: Coolify will automatically inject environment variables set in its UI.
+      # Sensitive variables like DATABASE_URL, NEXTAUTH_SECRET, etc. should be configured in Coolify.
