@@ -1,0 +1,190 @@
+.container {
+    padding: 30px;
+}
+
+.header {
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.card h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formGroup label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+    padding: 12px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Client Selector */
+.clientSelector {
+    border: 2px solid #eee;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.btnMini {
+    padding: 6px 12px;
+    font-size: 12px;
+    background: #f0f4ff;
+    color: #667eea;
+    border: 1px solid #667eea;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+
+.clientList {
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.clientItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.btnSubmit {
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: 10px;
+}
+
+.btnSubmit:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.btnSubmit:disabled {
+    opacity: 0.6;
+}
+
+/* History */
+.historyList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.historyItem {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.notifMeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.notifType {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.status {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.sent {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.failed {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.pending {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.subject {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.empty {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+}
+
+@media (max-width: 1024px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

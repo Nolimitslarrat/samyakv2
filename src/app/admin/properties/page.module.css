@@ -1,0 +1,150 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-size: 1.875rem;
+    color: #0f172a;
+}
+
+.addBtn {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.addBtn:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.toolbar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.search {
+    flex: 1;
+    position: relative;
+    max-width: 400px;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    outline: none;
+}
+
+.filter {
+    padding: 0 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    outline: none;
+    background: white;
+}
+
+.tableCard {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 1rem;
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    color: #334155;
+    font-size: 0.9rem;
+}
+
+.propertyName {
+    font-weight: 500;
+    color: #0f172a;
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.available {
+    background-color: #d1fae5;
+    color: #047857;
+}
+
+.sold {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.under-negotiation {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.iconBtn {
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.editBtn {
+    color: #3b82f6;
+}
+
+.editBtn:hover {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.deleteBtn {
+    color: #ef4444;
+}
+
+.deleteBtn:hover {
+    background-color: #fef2f2;
+    border-color: #fecaca;
+}
