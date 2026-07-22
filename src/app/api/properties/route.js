@@ -23,8 +23,13 @@ export async function POST(req) {
         const title = formData.get('title');
         const description = formData.get('description');
         const price = parseFloat(formData.get('price'));
+        const pricePerUnit = formData.get('pricePerUnit') ? parseFloat(formData.get('pricePerUnit')) : null;
         const location = formData.get('location');
         const area = parseFloat(formData.get('area'));
+        const dimensions = formData.get('dimensions') || null;
+        const frontWidth = formData.get('frontWidth') ? parseFloat(formData.get('frontWidth')) : null;
+        const isOnRoad = formData.get('isOnRoad') === 'true';
+        const contactPhone = formData.get('contactPhone') || null;
         const type = formData.get('type');
         const status = formData.get('status');
 
@@ -80,8 +85,13 @@ export async function POST(req) {
                 title,
                 description,
                 price,
+                pricePerUnit,
                 location,
                 area,
+                dimensions,
+                frontWidth,
+                isOnRoad,
+                contactPhone,
                 type,
                 status,
                 images: JSON.stringify(imageUrls),
@@ -122,8 +132,13 @@ export async function PUT(req) {
         const title = formData.get('title');
         const description = formData.get('description');
         const price = parseFloat(formData.get('price'));
+        const pricePerUnit = formData.get('pricePerUnit') ? parseFloat(formData.get('pricePerUnit')) : null;
         const location = formData.get('location');
         const area = parseFloat(formData.get('area'));
+        const dimensions = formData.get('dimensions') || null;
+        const frontWidth = formData.get('frontWidth') ? parseFloat(formData.get('frontWidth')) : null;
+        const isOnRoad = formData.get('isOnRoad') === 'true';
+        const contactPhone = formData.get('contactPhone') || null;
         const type = formData.get('type');
         const status = formData.get('status');
 
@@ -196,8 +211,13 @@ export async function PUT(req) {
                 title,
                 description,
                 price,
+                pricePerUnit,
                 location,
                 area,
+                dimensions,
+                frontWidth,
+                isOnRoad,
+                contactPhone,
                 type,
                 status,
                 images: JSON.stringify(imageUrls),

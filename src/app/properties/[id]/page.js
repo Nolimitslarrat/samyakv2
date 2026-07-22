@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { MapPin, Phone, Share2, ArrowLeft, Check, Calendar, Scaling, Home, FileText, Map } from 'lucide-react'
+import { MapPin, Phone, Share2, ArrowLeft, Check, Calendar, Scaling, Home, FileText, Map, Ruler } from 'lucide-react'
 import styles from './page.module.css'
 import ImageGallery from '@/components/property/ImageGallery'
 
@@ -26,13 +26,17 @@ export async function generateMetadata({ params }) {
 
     if (!property) return { title: 'Property Not Found' }
 
+    const rateStr = property.pricePerUnit
+        ? ` | ₹${property.pricePerUnit.toLocaleString('en-IN')}/gaj`
+        : ''
+
     return {
         title: `${property.title} | Samyak Properties - ${property.location}`,
-        description: `Check out this ${property.type} for sale in ${property.location}. Price: ₹${property.price}. Buy premium real estate in Pilkhuwa and Hapur with Samyak Properties.`,
+        description: `${property.type} for sale in ${property.location}. Area: ${property.area} Sq. Yards${rateStr}. Buy premium real estate in Pilkhuwa and Hapur with Samyak Properties.`,
         keywords: [property.type, property.location, 'Samyak Properties', `Buy ${property.type} in ${property.location}`, 'Property for sale Hapur Pilkhuwa'],
         openGraph: {
             title: `${property.title} | Samyak Properties`,
-            description: `Check out this ${property.type} for sale in ${property.location}.`,
+            description: `${property.type} for sale in ${property.location}.`,
             images: ['/images/hero-bg.jpg'],
         },
     }
@@ -61,14 +65,26 @@ export default async function PropertyDetails({ params }) {
     }
 
     const images = getImages(property)
-    const whatsappLink = `https://wa.me/919876543210?text=I am interested in ${property.title} (ID: ${property.id})`
+
+    // Contact number — use property-specific or fallback to company number
+    const rawPhone = (property.contactPhone || '919548278205').replace(/[^0-9]/g, '')
+    const displayPhone = rawPhone.startsWith('91') ? rawPhone.slice(2) : rawPhone
+    const whatsappLink = `https://wa.me/${rawPhone.startsWith('91') ? rawPhone : '91' + rawPhone}?text=Namaste! Main ${encodeURIComponent(property.title)} (ID: ${property.id}) mein interested hoon. Kripya details batayein.`
+    const callLink = `tel:+91${displayPhone}`
+
+    // Calculate rate per gaj
+    const ratePerGaj = property.pricePerUnit
+        ? property.pricePerUnit
+        : property.area > 0 ? Math.round(property.price / property.area) : null
 
     // Generate Structured JSON-LD Data for SEO
     const jsonLd = {
         '@context': 'https://schema.org',
         '@type': 'RealEstateListing',
         name: property.title,
-        description: property.description || `Property in ${property.location}`,
+        description: property.description
+            ? property.description.replace(/<[^>]+>/g, '') // Strip HTML for SEO
+            : `Property in ${property.location}`,
         image: images,
         offers: {
             '@type': 'Offer',
@@ -96,13 +112,31 @@ export default async function PropertyDetails({ params }) {
                     {/* Left: Info */}
                     <div className={styles.infoCol}>
                         <div className={styles.header}>
+                            {/* Badges */}
+                            <div className={styles.badges}>
+                                <span className={styles.typeBadge}>{property.type}</span>
+                                {property.isOnRoad && (
+                                    <span className={styles.onRoadBadge}>🛣️ On-Road Property</span>
+                                )}
+                            </div>
+
                             <h1 className={styles.title}>{property.title}</h1>
                             <div className={styles.location}>
                                 <MapPin size={20} className={styles.icon} /> {property.location}
                             </div>
-                            <div className={styles.price}>₹{property.price.toLocaleString()}</div>
+
+                            {/* Price section */}
+                            <div className={styles.priceSection}>
+                                <div className={styles.price}>₹{property.price.toLocaleString('en-IN')}</div>
+                                {ratePerGaj && (
+                                    <div className={styles.rateTag}>
+                                        ₹{ratePerGaj.toLocaleString('en-IN')} / gaj
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
+                        {/* Key Details Grid */}
                         <div className={styles.features}>
                             <div className={styles.featItem}>
                                 <span className={styles.featLabel}>Type</span>
@@ -110,17 +144,36 @@ export default async function PropertyDetails({ params }) {
                             </div>
                             <div className={styles.featItem}>
                                 <span className={styles.featLabel}>Area</span>
-                                <span className={styles.featVal}><Scaling size={16} /> {property.area}</span>
+                                <span className={styles.featVal}><Scaling size={16} /> {property.area} Sq. Yards</span>
                             </div>
+                            {property.dimensions && (
+                                <div className={styles.featItem}>
+                                    <span className={styles.featLabel}>Dimensions</span>
+                                    <span className={styles.featVal}>📐 {property.dimensions}</span>
+                                </div>
+                            )}
+                            {property.frontWidth && (
+                                <div className={styles.featItem}>
+                                    <span className={styles.featLabel}>Front Width</span>
+                                    <span className={styles.featVal}><Ruler size={16} /> {property.frontWidth} feet</span>
+                                </div>
+                            )}
                             <div className={styles.featItem}>
                                 <span className={styles.featLabel}>Posted</span>
-                                <span className={styles.featVal}><Calendar size={16} /> {new Date(property.createdAt).toLocaleDateString()}</span>
+                                <span className={styles.featVal}>
+                                    <Calendar size={16} />
+                                    {new Date(property.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                </span>
                             </div>
                         </div>
 
+                        {/* Description — renders HTML from Quill */}
                         <div className={styles.description}>
                             <h3>Description</h3>
-                            <p>{property.description || "No description provided."}</p>
+                            {property.description
+                                ? <div dangerouslySetInnerHTML={{ __html: property.description }} className={styles.richText} />
+                                : <p>No description provided.</p>
+                            }
                         </div>
 
                         {property.video && (
@@ -138,14 +191,14 @@ export default async function PropertyDetails({ params }) {
                     <div className={styles.contactCol}>
                         <div className={styles.contactCard}>
                             <h3>Interested in this property?</h3>
-                            <p>Connect with us to schedule a visit or get more details.</p>
+                            <p>Samyak Properties ke expert se baat karein. Site visit schedule karein ya aur details lein.</p>
 
                             <a href={whatsappLink} target="_blank" className={styles.whatsappBtn}>
-                                <Share2 size={18} /> Share / Chat on WhatsApp
+                                <Share2 size={18} /> Chat on WhatsApp
                             </a>
-                            <Link href="/contact" className={styles.contactBtn}>
-                                <Phone size={18} /> Contact Us Now
-                            </Link>
+                            <a href={callLink} className={styles.callBtn}>
+                                <Phone size={18} /> Call: {displayPhone.replace(/(\d{5})(\d{5})/, '$1 $2')}
+                            </a>
 
                             <div className={styles.secureNote}>
                                 <Check size={14} /> Verified Property

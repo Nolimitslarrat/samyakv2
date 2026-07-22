@@ -9,21 +9,26 @@ generator client {
 }
 
 model Property {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  price       Float
-  location    String
-  area        Float    
-  type        String   // Plot, Residential, Commercial, Land
-  status      String   @default("Available") // Available, Sold, Under Negotiation
-  featured    Boolean  @default(false)
-  images      String   // Stored as JSON string
-  video       String?  // Path to video file
-  brochure    String?  // Path to PDF/Doc
-  propertyPlan String? // Path to image
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String   // Stored as HTML (rich text)
+  price        Float
+  pricePerUnit Float?   // Price per Sq. Yard (₹/gaj)
+  location     String
+  area         Float
+  dimensions   String?  // e.g. "30x24 feet"
+  frontWidth   Float?   // Road frontage in feet
+  isOnRoad     Boolean  @default(false)
+  contactPhone String?  // Direct contact number for this property
+  type         String   // Plot, Residential, Commercial, Land
+  status       String   @default("Available") // Available, Sold, Under Negotiation
+  featured     Boolean  @default(false)
+  images       String   // Stored as JSON string
+  video        String?  // Path to video file
+  brochure     String?  // Path to PDF/Doc
+  propertyPlan String?  // Path to image
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Admin {
