@@ -46,7 +46,8 @@ export default function AddProperty() {
                 alert("Property Added Successfully")
                 router.push('/admin/properties')
             } else {
-                alert("Failed to add property")
+                const errData = await res.json().catch(() => ({}));
+                alert("Failed to add property: " + (errData.error || "Unknown error"));
             }
         } catch (err) {
             console.error(err)
