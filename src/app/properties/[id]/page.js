@@ -27,9 +27,12 @@ export async function generateMetadata({ params }) {
     if (!property) return { title: 'Property Not Found' }
 
     return {
-        title: `${property.title} | Samyak Properties`,
-        description: `Check out this ${property.type} for sale in ${property.location}. Price: ₹${property.price}. Contact us for a visit!`,
+        title: `${property.title} | Samyak Properties - ${property.location}`,
+        description: `Check out this ${property.type} for sale in ${property.location}. Price: ₹${property.price}. Buy premium real estate in Pilkhuwa and Hapur with Samyak Properties.`,
+        keywords: [property.type, property.location, 'Samyak Properties', `Buy ${property.type} in ${property.location}`, 'Property for sale Hapur Pilkhuwa'],
         openGraph: {
+            title: `${property.title} | Samyak Properties`,
+            description: `Check out this ${property.type} for sale in ${property.location}.`,
             images: ['/images/hero-bg.jpg'],
         },
     }
@@ -60,8 +63,27 @@ export default async function PropertyDetails({ params }) {
     const images = getImages(property)
     const whatsappLink = `https://wa.me/919876543210?text=I am interested in ${property.title} (ID: ${property.id})`
 
+    // Generate Structured JSON-LD Data for SEO
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'RealEstateListing',
+        name: property.title,
+        description: property.description || `Property in ${property.location}`,
+        image: images,
+        offers: {
+            '@type': 'Offer',
+            price: property.price,
+            priceCurrency: 'INR',
+            availability: 'https://schema.org/InStock'
+        },
+    }
+
     return (
         <main className={styles.main}>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <div className={`container ${styles.container}`}>
                 <Link href="/properties" className={styles.backLink}>
                     <ArrowLeft size={18} /> Back to Listings

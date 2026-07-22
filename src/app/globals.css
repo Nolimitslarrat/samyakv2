@@ -1,3 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #D4AF37;
+  --color-primary-dark: #B5952F;
+  --color-secondary: #0A192F;
+  --color-secondary-light: #172A46;
+}
+
 :root {
   /* Brand Colors */
   --color-primary: #D4AF37; /* Gold - Premium feel */

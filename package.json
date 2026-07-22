@@ -32,7 +32,11 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "autoprefixer": "^10.5.4",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6"
+    "eslint-config-next": "16.1.6",
+    "postcss": "^8.5.22",
+    "tailwindcss": "^4.3.3"
   }
 }
