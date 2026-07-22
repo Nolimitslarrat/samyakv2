@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Commercial Plot - Brochure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #D4AF37; /* Gold */
+            --dark: #0A192F;
+            --light: #f8fafc;
+            --gray: #64748b;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background-color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+        }
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        /* Header / Hero */
+        .hero {
+            background-color: var(--dark);
+            color: white;
+            padding: 40px;
+            position: relative;
+            text-align: center;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: var(--primary);
+        }
+        .company-name {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .title {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            line-height: 1.2;
+        }
+        .subtitle {
+            font-size: 18px;
+            color: #cbd5e1;
+            font-weight: 300;
+            margin: 0;
+        }
+
+        /* Content Grid */
+        .content {
+            padding: 50px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--gray);
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 5px;
+        }
+
+        /* Stats Blocks */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .stat-box {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        /* Description */
+        .desc-text {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #334155;
+            margin-bottom: 30px;
+        }
+        .highlight {
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        /* Pricing */
+        .price-box {
+            background: var(--dark);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .price-total {
+            font-size: 32px;
+            color: var(--primary);
+            font-weight: 800;
+            margin: 10px 0;
+        }
+        .price-rate {
+            font-size: 16px;
+            color: #cbd5e1;
+        }
+
+        /* Contact Footer */
+        .footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #f1f5f9;
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+        .contact-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        .phone-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+        .call-action {
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* Decorative Element */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 150px;
+            font-weight: 800;
+            color: rgba(212, 175, 55, 0.03);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        @media print {
+            body { background: white; }
+            .a4-page { margin: 0; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="a4-page">
+        <div class="watermark">SAMYAK PROPERTIES</div>
+
+        <div class="hero">
+            <div class="company-name">Samyak Properties Presents</div>
+            <h1 class="title">Premium Commercial Plot</h1>
+            <p class="subtitle">On Indian Gas Agency Road, Pilkhuwa</p>
+        </div>
+
+        <div class="content">
+            <!-- Left Column -->
+            <div>
+                <div class="section-title">Property Overview</div>
+                <p class="desc-text">
+                    An exceptional opportunity to acquire a prime, <span class="highlight">fully commercial</span> real estate asset. 
+                    Situated directly on the main road, this plot guarantees maximum visibility and high footfall, making it the perfect foundation for a showroom, retail complex, or high-capacity godown.
+                </p>
+                
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value">242</div>
+                        <div class="stat-label">Sq. Yards Area</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">30 Ft</div>
+                        <div class="stat-label">Road Frontage</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" style="font-size: 20px;">On-Road</div>
+                        <div class="stat-label">Premium Access</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" style="font-size: 20px;">Commercial</div>
+                        <div class="stat-label">Zoning Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div>
+                <div class="section-title">Investment Summary</div>
+                
+                <ul class="desc-text" style="padding-left: 20px; list-style-type: square;">
+                    <li>Strategically located on Indian Gas Agency Road</li>
+                    <li>Wide 30 feet front allows for grand showroom entrances</li>
+                    <li>Excellent connectivity to main highways</li>
+                    <li>High ROI potential in a rapidly developing commercial hub</li>
+                    <li>Clear title and ready for immediate construction</li>
+                </ul>
+
+                <div class="price-box">
+                    <div style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; font-weight: 600;">Asking Price</div>
+                    <div class="price-total">₹ 1,08,90,000</div>
+                    <div class="price-rate">Calculated at ₹45,000 per Sq. Yard</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="contact-title">Interested in this property?</div>
+            <div class="call-action">Call / WhatsApp to schedule a site visit</div>
+            <div class="phone-number">+91 9548278205</div>
+            <div style="font-size: 13px; color: #94a3b8; margin-top: 15px;">
+                Samyak Properties | Trusted Real Estate Partners
+            </div>
+        </div>
+    </div>
+</body>
+</html>

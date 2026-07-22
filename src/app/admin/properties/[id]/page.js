@@ -1,9 +1,13 @@
 'use client'
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter, useParams } from 'next/navigation'
-import { ArrowLeft, Save, Upload, Video, X, Image as ImageIcon } from 'lucide-react'
-import styles from '../add/page.module.css'
+import { ArrowLeft, Save, Upload, Video, X, Image as ImageIcon, IndianRupee, Ruler, Phone, FileText, Map } from 'lucide-react'
+import styles from '../add/page.module.css' // We reuse the Add page CSS
+
+// Load Quill dynamically (SSR disabled — it uses browser APIs)
+const QuillEditor = dynamic(() => import('@/components/admin/QuillEditor'), { ssr: false })
 
 export default function EditProperty() {
     const router = useRouter()
@@ -13,12 +17,30 @@ export default function EditProperty() {
     const [loading, setLoading] = useState(false)
     const [fetchingProperty, setFetchingProperty] = useState(true)
     const [formData, setFormData] = useState({
-        title: '', price: '', location: '', type: 'Plot', area: '', status: 'Available', description: ''
+        title: '',
+        price: '',
+        pricePerUnit: '',
+        location: '',
+        type: 'Plot',
+        area: '',
+        dimensions: '',
+        frontWidth: '',
+        isOnRoad: false,
+        contactPhone: '',
+        status: 'Available',
     })
+    const [description, setDescription] = useState('')
+
     const [existingImages, setExistingImages] = useState([]) // URLs of existing images
     const [newImages, setNewImages] = useState([]) // New File objects to upload
     const [video, setVideo] = useState(null)
     const [existingVideo, setExistingVideo] = useState(null)
+
+    const [brochure, setBrochure] = useState(null)
+    const [existingBrochure, setExistingBrochure] = useState(null)
+
+    const [propertyPlan, setPropertyPlan] = useState(null)
+    const [existingPropertyPlan, setExistingPropertyPlan] = useState(null)
 
     useEffect(() => {
         // Fetch existing property data
@@ -30,12 +52,17 @@ export default function EditProperty() {
                     setFormData({
                         title: data.title || '',
                         price: data.price || '',
+                        pricePerUnit: data.pricePerUnit || '',
                         location: data.location || '',
                         type: data.type || 'Plot',
                         area: data.area || '',
+                        dimensions: data.dimensions || '',
+                        frontWidth: data.frontWidth || '',
+                        isOnRoad: data.isOnRoad || false,
+                        contactPhone: data.contactPhone || '',
                         status: data.status || 'Available',
-                        description: data.description || ''
                     })
+                    setDescription(data.description || '')
 
                     // Parse and set existing images
                     try {
@@ -45,10 +72,10 @@ export default function EditProperty() {
                         setExistingImages([])
                     }
 
-                    // Set existing video
-                    if (data.video) {
-                        setExistingVideo(data.video)
-                    }
+                    // Set existing media
+                    if (data.video) setExistingVideo(data.video)
+                    if (data.brochure) setExistingBrochure(data.brochure)
+                    if (data.propertyPlan) setExistingPropertyPlan(data.propertyPlan)
                 } else {
                     alert('Property not found')
                     router.push('/admin/properties')
@@ -66,19 +93,19 @@ export default function EditProperty() {
         }
     }, [propertyId, router])
 
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target
+        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
+    }
+
     const handleImageChange = (e) => {
         if (e.target.files) {
             setNewImages(prev => [...prev, ...Array.from(e.target.files)])
         }
     }
 
-    const removeNewImage = (index) => {
-        setNewImages(prev => prev.filter((_, i) => i !== index))
-    }
-
-    const removeExistingImage = (index) => {
-        setExistingImages(prev => prev.filter((_, i) => i !== index))
-    }
+    const removeNewImage = (index) => setNewImages(prev => prev.filter((_, i) => i !== index))
+    const removeExistingImage = (index) => setExistingImages(prev => prev.filter((_, i) => i !== index))
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -87,16 +114,16 @@ export default function EditProperty() {
         const data = new FormData()
         data.append('id', propertyId)
         Object.keys(formData).forEach(key => data.append(key, formData[key]))
+        data.append('description', description)
 
         // Send existing images as JSON string
         data.append('existingImages', JSON.stringify(existingImages))
 
-        // Send new images as files
+        // Send new files
         newImages.forEach(file => data.append('images', file))
-
         if (video) data.append('video', video)
-        if (formData.brochure) data.append('brochure', formData.brochure)
-        if (formData.propertyPlan) data.append('propertyPlan', formData.propertyPlan)
+        if (brochure) data.append('brochure', brochure)
+        if (propertyPlan) data.append('propertyPlan', propertyPlan)
 
         try {
             const res = await fetch('/api/properties', {
@@ -105,10 +132,11 @@ export default function EditProperty() {
             })
 
             if (res.ok) {
-                alert("Property Updated Successfully")
+                alert("Property Updated Successfully!")
                 router.push('/admin/properties')
             } else {
-                alert("Failed to update property")
+                const errData = await res.json().catch(() => ({}))
+                alert('Failed to update: ' + (errData.error || 'Unknown error'))
             }
         } catch (err) {
             console.error(err)
@@ -119,7 +147,7 @@ export default function EditProperty() {
     }
 
     if (fetchingProperty) {
-        return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading property...</div>
+        return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading property details...</div>
     }
 
     return (
@@ -133,66 +161,146 @@ export default function EditProperty() {
             </div>
 
             <form onSubmit={handleSubmit} className={styles.formCard}>
+                
+                {/* ── Section 1: Basic Info ─────────────────────────── */}
+                <div className={styles.sectionTitle}>📋 Basic Information</div>
                 <div className={styles.grid}>
-                    {/* Basic Fields */}
-                    <div className={styles.formGroup}>
-                        <label>Property Title</label>
+                    <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                        <label>Property Title <span className={styles.required}>*</span></label>
                         <input
-                            type="text" required className={styles.input}
-                            value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })}
+                            type="text" name="title" required className={styles.input}
+                            value={formData.title} onChange={handleChange}
                         />
                     </div>
+
                     <div className={styles.formGroup}>
-                        <label>Price (₹)</label>
-                        <input
-                            type="number" required className={styles.input}
-                            value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })}
-                        />
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label>Location</label>
-                        <input
-                            type="text" required className={styles.input}
-                            value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })}
-                        />
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label>Type</label>
-                        <select className={styles.select} value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}>
+                        <label>Property Type <span className={styles.required}>*</span></label>
+                        <select name="type" className={styles.select} value={formData.type} onChange={handleChange}>
                             <option value="Plot">Plot / Land</option>
                             <option value="Residential">Residential</option>
                             <option value="Commercial">Commercial</option>
+                            <option value="Agricultural">Agricultural</option>
                         </select>
                     </div>
-                    <div className={styles.formGroup}>
-                        <label>Area (Sq. Yards/Meters)</label>
-                        <input
-                            type="number" required className={styles.input}
-                            value={formData.area} onChange={e => setFormData({ ...formData, area: e.target.value })}
-                        />
-                    </div>
+
                     <div className={styles.formGroup}>
                         <label>Status</label>
-                        <select className={styles.select} value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
+                        <select name="status" className={styles.select} value={formData.status} onChange={handleChange}>
                             <option value="Available">Available</option>
                             <option value="Sold">Sold</option>
                             <option value="Under Negotiation">Under Negotiation</option>
                         </select>
                     </div>
+
+                    <div className={styles.formGroup}>
+                        <label>Location / Address <span className={styles.required}>*</span></label>
+                        <input
+                            type="text" name="location" required className={styles.input}
+                            value={formData.location} onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>
+                            <span className={styles.labelIcon}><Phone size={14} /></span>
+                            Direct Contact Number
+                        </label>
+                        <input
+                            type="tel" name="contactPhone" className={styles.input}
+                            value={formData.contactPhone} onChange={handleChange}
+                        />
+                    </div>
                 </div>
 
+                {/* ── Section 2: Pricing ────────────────────────────── */}
+                <div className={styles.sectionTitle}>💰 Pricing Details</div>
+                <div className={styles.grid}>
+                    <div className={styles.formGroup}>
+                        <label>Total Price (₹) <span className={styles.required}>*</span></label>
+                        <div className={styles.inputWithIcon}>
+                            <IndianRupee size={16} className={styles.inputIcon} />
+                            <input
+                                type="number" name="price" required className={styles.input}
+                                value={formData.price} onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>
+                            <span className={styles.labelIcon}><IndianRupee size={14} /></span>
+                            Price per Sq. Yard (₹/gaj)
+                        </label>
+                        <div className={styles.inputWithIcon}>
+                            <IndianRupee size={16} className={styles.inputIcon} />
+                            <input
+                                type="number" name="pricePerUnit" className={styles.input}
+                                value={formData.pricePerUnit} onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Section 3: Plot Dimensions ────────────────────── */}
+                <div className={styles.sectionTitle}>📐 Plot Dimensions</div>
+                <div className={styles.grid}>
+                    <div className={styles.formGroup}>
+                        <label>Area (Sq. Yards) <span className={styles.required}>*</span></label>
+                        <div className={styles.inputWithIcon}>
+                            <Ruler size={16} className={styles.inputIcon} />
+                            <input
+                                type="number" name="area" required className={styles.input}
+                                value={formData.area} onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>Plot Dimensions</label>
+                        <input
+                            type="text" name="dimensions" className={styles.input}
+                            value={formData.dimensions} onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>Road Frontage / Front Width (feet)</label>
+                        <input
+                            type="number" name="frontWidth" className={styles.input}
+                            value={formData.frontWidth} onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>On-Road Property?</label>
+                        <div className={styles.toggleRow}>
+                            <label className={styles.toggle}>
+                                <input
+                                    type="checkbox" name="isOnRoad"
+                                    checked={formData.isOnRoad} onChange={handleChange}
+                                />
+                                <span className={styles.toggleSlider}></span>
+                            </label>
+                            <span className={styles.toggleLabel}>
+                                {formData.isOnRoad ? '✅ Haan, On-Road Property' : 'Nahi (Inside Colony)'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Section 4: Description ────────────────────────── */}
+                <div className={styles.sectionTitle}>📝 Property Description</div>
                 <div className={styles.formGroup}>
-                    <label>Description</label>
-                    <textarea
-                        rows="4" className={styles.textarea}
-                        value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}
-                    ></textarea>
+                    <label>Detailed Description</label>
+                    <QuillEditor value={description} onChange={setDescription} />
                 </div>
 
-                {/* Image Upload */}
+                {/* ── Section 5: Media Uploads ──────────────────────── */}
+                <div className={styles.sectionTitle}>🖼️ Images & Media</div>
+                
                 <div className={styles.formGroup}>
                     <label>Property Images</label>
-
+                    
                     {/* Existing Images */}
                     {existingImages.length > 0 && (
                         <div style={{ marginBottom: '1rem' }}>
@@ -205,21 +313,10 @@ export default function EditProperty() {
                                         <img
                                             src={url}
                                             alt={`Existing ${idx + 1}`}
-                                            style={{
-                                                width: '60px',
-                                                height: '60px',
-                                                objectFit: 'cover',
-                                                borderRadius: '4px',
-                                                marginRight: '0.5rem'
-                                            }}
+                                            style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', marginRight: '0.5rem' }}
                                         />
                                         <span className={styles.filename} style={{ flex: 1 }}>Image {idx + 1}</span>
-                                        <button
-                                            type="button"
-                                            onClick={() => removeExistingImage(idx)}
-                                            className={styles.removeBtn}
-                                            title="Remove this image"
-                                        >
+                                        <button type="button" onClick={() => removeExistingImage(idx)} className={styles.removeBtn} title="Remove this image">
                                             <X size={14} />
                                         </button>
                                     </div>
@@ -260,7 +357,6 @@ export default function EditProperty() {
                     )}
                 </div>
 
-                {/* Video Upload */}
                 <div className={styles.formGroup}>
                     <label>Property Video (Optional)</label>
                     {existingVideo && (
@@ -268,35 +364,46 @@ export default function EditProperty() {
                             Current video: <a href={existingVideo} target="_blank" style={{ color: 'var(--color-primary)' }}>View</a>
                         </p>
                     )}
-                    <div className={styles.uploadBox}>
+                    <div className={styles.uploadBox} style={{ padding: '1rem' }}>
                         <input
                             type="file" accept="video/*"
                             className={styles.fileInput}
                             onChange={(e) => setVideo(e.target.files[0])}
                         />
                         <div className={styles.uploadPlaceholder}>
-                            <Video size={24} />
-                            <p>{video ? video.name : existingVideo ? 'Upload new video to replace' : 'Click to upload new video'}</p>
+                            <Video size={22} />
+                            <p>{video ? video.name : 'Upload new video to replace'}</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Documents Upload */}
                 <div className={styles.grid}>
                     <div className={styles.formGroup}>
-                        <label>Brochure (PDF - Optional)</label>
+                        <label>Brochure (PDF)</label>
+                        {existingBrochure && (
+                            <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.3rem' }}>
+                                <a href={existingBrochure} target="_blank" style={{ color: '#2563eb' }}>View Current Brochure</a>
+                            </p>
+                        )}
                         <div className={styles.miniUpload}>
-                            <input type="file" accept=".pdf" onChange={(e) => setFormData({ ...formData, brochure: e.target.files[0] })} />
+                            <input type="file" accept=".pdf" onChange={(e) => setBrochure(e.target.files[0])} />
                         </div>
                     </div>
+                    
                     <div className={styles.formGroup}>
-                        <label>Property Plan (Image - Optional)</label>
+                        <label>Property Plan (Image)</label>
+                        {existingPropertyPlan && (
+                            <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.3rem' }}>
+                                <a href={existingPropertyPlan} target="_blank" style={{ color: '#2563eb' }}>View Current Plan</a>
+                            </p>
+                        )}
                         <div className={styles.miniUpload}>
-                            <input type="file" accept="image/*" onChange={(e) => setFormData({ ...formData, propertyPlan: e.target.files[0] })} />
+                            <input type="file" accept="image/*" onChange={(e) => setPropertyPlan(e.target.files[0])} />
                         </div>
                     </div>
                 </div>
 
+                {/* ── Actions ───────────────────────────────────────── */}
                 <div className={styles.actions}>
                     <button type="button" className={styles.cancelBtn} onClick={() => router.back()}>Cancel</button>
                     <button type="submit" className={styles.saveBtn} disabled={loading}>
