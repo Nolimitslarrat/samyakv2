@@ -1,43 +1,94 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Menu, X, Phone, MapPin } from 'lucide-react'
-import styles from './Navbar.module.css'
+import { Menu, X } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
+    const pathname = usePathname()
+
+    const navLinks = [
+        { href: '/', label: 'Home' },
+        { href: '/properties', label: 'Properties' },
+        { href: '/about', label: 'About Us' },
+    ]
+
+    const isActive = (href) => {
+        if (href === '/') return pathname === '/'
+        return pathname.startsWith(href)
+    }
 
     return (
-        <nav className="fixed w-full z-50 bg-[#0A192F]/90 backdrop-blur-md border-b border-white/10 shadow-sm transition-all duration-300">
-            <div className="container mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
-                <Link href="/" className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                    <span className="w-8 h-8 bg-[#D4AF37] rounded-lg flex items-center justify-center text-[#0A192F] font-bold">S</span>
-                    Samyak <span className="text-[#D4AF37] font-light">Properties</span>
+        <nav className="fixed w-full z-50 bg-[#0A192F]/95 backdrop-blur-md border-b border-white/10 shadow-lg">
+            <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+                {/* Logo */}
+                <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
+                    <span className="w-9 h-9 bg-[#D4AF37] rounded-lg flex items-center justify-center text-[#0A192F] font-black text-lg shadow-md">
+                        S
+                    </span>
+                    <span className="text-xl font-black text-white tracking-tight">
+                        Samyak <span className="text-[#D4AF37] font-light">Properties</span>
+                    </span>
                 </Link>
 
-                {/* Desktop Menu */}
-                <div className="hidden md:flex items-center space-x-8">
-                    <Link href="/" className="text-slate-300 hover:text-white font-medium text-sm tracking-wide transition-colors">Home</Link>
-                    <Link href="/properties" className="text-slate-300 hover:text-white font-medium text-sm tracking-wide transition-colors">Properties</Link>
-                    <Link href="/about" className="text-slate-300 hover:text-white font-medium text-sm tracking-wide transition-colors">About Us</Link>
-                    <Link href="/contact" className="px-6 py-2.5 bg-[#D4AF37] hover:bg-[#B5952F] text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)]">
+                {/* Desktop Nav Links */}
+                <div className="hidden md:flex items-center gap-8">
+                    {navLinks.map(({ href, label }) => (
+                        <Link
+                            key={href}
+                            href={href}
+                            className={`font-semibold text-sm tracking-wide transition-colors duration-200 ${
+                                isActive(href)
+                                    ? 'text-[#D4AF37]'
+                                    : 'text-slate-200 hover:text-white'
+                            }`}
+                        >
+                            {label}
+                        </Link>
+                    ))}
+                    <Link
+                        href="/contact"
+                        className="ml-2 px-6 py-2.5 bg-[#D4AF37] hover:bg-[#B5952F] text-white font-bold rounded-xl transition-all duration-200 shadow-[0_0_20px_rgba(212,175,55,0.25)] hover:shadow-[0_0_28px_rgba(212,175,55,0.45)] hover:-translate-y-px"
+                    >
                         Contact Us
                     </Link>
                 </div>
 
-                {/* Mobile Menu Button */}
-                <button className="md:hidden text-white p-2 focus:outline-none" onClick={() => setIsOpen(!isOpen)}>
-                    {isOpen ? <X size={28} /> : <Menu size={28} />}
+                {/* Mobile Hamburger */}
+                <button
+                    className="md:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+                    onClick={() => setIsOpen(!isOpen)}
+                    aria-label="Toggle menu"
+                >
+                    {isOpen ? <X size={26} /> : <Menu size={26} />}
                 </button>
             </div>
 
-            {/* Mobile Menu */}
+            {/* Mobile Dropdown */}
             {isOpen && (
-                <div className="md:hidden absolute top-20 left-0 w-full bg-[#0A192F] border-b border-white/10 shadow-2xl flex flex-col p-6 space-y-4 animate-in slide-in-from-top-2">
-                    <Link href="/" className="text-slate-300 hover:text-[#D4AF37] font-medium text-lg" onClick={() => setIsOpen(false)}>Home</Link>
-                    <Link href="/properties" className="text-slate-300 hover:text-[#D4AF37] font-medium text-lg" onClick={() => setIsOpen(false)}>Properties</Link>
-                    <Link href="/about" className="text-slate-300 hover:text-[#D4AF37] font-medium text-lg" onClick={() => setIsOpen(false)}>About Us</Link>
-                    <Link href="/contact" className="px-6 py-3 bg-[#D4AF37] text-white text-center font-bold rounded-xl mt-4" onClick={() => setIsOpen(false)}>Contact Us</Link>
+                <div className="md:hidden absolute top-20 left-0 w-full bg-[#0A192F] border-t border-white/10 shadow-2xl">
+                    <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-4">
+                        {navLinks.map(({ href, label }) => (
+                            <Link
+                                key={href}
+                                href={href}
+                                className={`text-lg font-semibold transition-colors py-2 border-b border-white/5 ${
+                                    isActive(href) ? 'text-[#D4AF37]' : 'text-slate-300 hover:text-[#D4AF37]'
+                                }`}
+                                onClick={() => setIsOpen(false)}
+                            >
+                                {label}
+                            </Link>
+                        ))}
+                        <Link
+                            href="/contact"
+                            className="mt-2 px-6 py-3.5 bg-[#D4AF37] text-white text-center font-bold rounded-xl hover:bg-[#B5952F] transition-colors"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Contact Us
+                        </Link>
+                    </div>
                 </div>
             )}
         </nav>
